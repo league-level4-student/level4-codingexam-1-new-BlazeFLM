@@ -25,7 +25,13 @@ package scheduler;
  */
 public class Scheduler {
 
-    public static void main(String[] args) {
+	public static void main(String[] args) {
+		
+	}
 
-    }
+	public void createEvent(Day d, String time, String desc) {
+		Event e = new Event(time, desc);
+		Day.SUNDAY(events.)
+	}
+
 }
