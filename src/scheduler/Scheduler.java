@@ -1,5 +1,8 @@
 package scheduler;
 
+import java.util.HashMap;
+import java.util.Scanner;
+
 /*
  * Objective: Create a weekly scheduling application.
  * 
@@ -26,12 +29,62 @@ package scheduler;
 public class Scheduler {
 
 	public static void main(String[] args) {
+		Scheduler scheduler = new Scheduler();
+		Scanner s = new Scanner(System.in);
+		String input = s.nextLine();
 		
+		//unfinished
+		
+		s.close();
+	}
+	
+	
+	
+	
+	
+	private HashMap<Day, LinkedList<Event>> week;
+
+	public Scheduler() {
+		week = new HashMap<Day, LinkedList<Event>>();
+		for (Day d : Day.values()) {
+			week.put(d, new LinkedList<>());
+		}
 	}
 
-	public void createEvent(Day d, String time, String desc) {
-		Event e = new Event(time, desc);
-		Day.SUNDAY(events.)
+	
+
+	public void createEvent(Day d, String time, String desc) throws SchedulingConflictException {
+		Event event = new Event(time, desc);
+
+		LinkedList<Event> eventDay = week.get(d);
+		Node<Event> e = new Node<Event>(event);
+		
+		for (int i = 0; i < eventDay.size(); i++) {
+			if (e.getValue().getTime().equals(time)) {
+				throw new SchedulingConflictException();
+			}
+		}
+		
+		eventDay.add(event);
+		
+		
+		System.out.println("Event added: " + desc + " at " + time + " on " + d);
+
+	}
+	
+	public void viewEvents(Day d) {
+		LinkedList<Event> eventDay = week.get(d);
+		
+		if (eventDay.size() == 0) {
+            System.out.println("No events scheduled for " + d);
+        } else {
+            System.out.println("Events for " + d + ":");
+            Node<Event> current = eventDay.getHead();
+            while (current != null) {
+                System.out.println(current.getValue().getTime() + " - " + current.getValue().getDesc());
+                current = current.getNext();
+            }
+        }
 	}
 
 }
