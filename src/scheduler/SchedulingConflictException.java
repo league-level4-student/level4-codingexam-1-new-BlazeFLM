@@ -4,6 +4,6 @@ package scheduler;
 public class SchedulingConflictException extends Exception {
 
 	public SchedulingConflictException() {
-		System.out.println("This time slot is already booked.");
+		System.out.println("This time slot is already booked");
 	}
 }

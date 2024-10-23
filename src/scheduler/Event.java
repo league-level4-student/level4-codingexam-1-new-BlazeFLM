@@ -1,17 +1,22 @@
 package scheduler;
 
-public class Event {
-	private String time;
-	private String desc;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
-	public Event(String time, String desc) {
-		this.time = time;
+public class Event {
+	private LocalTime time;
+    private String desc;
+
+	public Event(String time, String desc) throws DateTimeParseException {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        this.time = LocalTime.parse(time, formatter);
 		this.desc = desc;
 	}
 
-	public String getTime() {
-		return time;
-	}
+	public LocalTime getTime() {
+        return time;
+    }
 
 	public String getDesc() {
 		return desc;

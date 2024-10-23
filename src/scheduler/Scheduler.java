@@ -31,17 +31,74 @@ public class Scheduler {
 	public static void main(String[] args) {
 		Scheduler scheduler = new Scheduler();
 		Scanner s = new Scanner(System.in);
-		String input = s.nextLine();
+
 		
-		//unfinished
 		
-		s.close();
+		while(true) {
+			
+			System.out.println("Choose an option: ");
+	        System.out.println("1. Add Event");
+	        System.out.println("2. View Events");
+	        System.out.println("3. Remove Event");
+	        System.out.println("4. Exit");
+	        String input = s.nextLine();
+	        
+			scheduler.run(input, s, scheduler);
+		}
+		
 	}
-	
-	
-	
-	
-	
+
+	void run(String num, Scanner s, Scheduler scheduler) {
+
+		 
+         
+		switch (num) {
+		case "1":
+			System.out.println("Enter day of the week (e.g., MONDAY): ");
+			String dayInput = s.nextLine().toUpperCase();
+			Day day = Day.valueOf(dayInput);
+
+			System.out.println("Enter time (e.g., 10:00): ");
+			String time = s.nextLine();
+
+			System.out.println("Enter event description: ");
+			String description = s.nextLine();
+
+			try {
+				scheduler.createEvent(day, time, description);
+			} catch (SchedulingConflictException e) {
+				System.out.println(e.getMessage());
+			}
+			break;
+		case "2": 
+			System.out.println("Enter day of the week to view events (e.g., MONDAY): ");
+			dayInput = s.nextLine().toUpperCase();
+			day = Day.valueOf(dayInput);
+
+			scheduler.viewEvents(day);
+			break;
+		case "3":
+            System.out.println("Enter day of the week (e.g., MONDAY): ");
+            dayInput = s.nextLine().toUpperCase();
+            day = Day.valueOf(dayInput);
+
+            System.out.println("Enter time of the event to remove (e.g., 10:00): ");
+            time = s.nextLine();
+
+            scheduler.removeEvent(day, time);
+            break;
+		case "4":
+            System.out.println("Exiting...");
+            s.close();
+            System.exit(0);
+            break;
+
+        default:
+            System.out.println("Invalid option, please try again.");
+
+		}
+	}
+
 	private HashMap<Day, LinkedList<Event>> week;
 
 	public Scheduler() {
@@ -51,40 +108,76 @@ public class Scheduler {
 		}
 	}
 
-	
-
 	public void createEvent(Day d, String time, String desc) throws SchedulingConflictException {
-		Event event = new Event(time, desc);
+	    Event event = new Event(time, desc);
+	    LinkedList<Event> eventDay = week.get(d);
 
-		LinkedList<Event> eventDay = week.get(d);
-		Node<Event> e = new Node<Event>(event);
-		
-		for (int i = 0; i < eventDay.size(); i++) {
-			if (e.getValue().getTime().equals(time)) {
-				throw new SchedulingConflictException();
-			}
-		}
-		
-		eventDay.add(event);
-		
-		
-		System.out.println("Event added: " + desc + " at " + time + " on " + d);
+	    Node<Event> current = eventDay.getHead();
+	    
+	    while (current != null) {
+	        if (current.getValue().getTime().equals(event.getTime())) {
+	            throw new SchedulingConflictException();
+	        }
+	        		
+	        if (current.getValue().getTime().isAfter(event.getTime())) {
+	            Node<Event> newNode = new Node<Event>(event);
+	            Node<Event> prev = current.getPrev();
 
+	            if (prev != null) {
+	                prev.setNext(newNode);
+	            } else {
+	                eventDay.setHead(newNode);
+	            }
+
+	            newNode.setPrev(prev);
+	            newNode.setNext(current);
+	            current.setPrev(newNode);
+	            return;
+	        }
+	        current = current.getNext();
+	    }
+
+	    eventDay.add(event); 
+	    System.out.println("Event added: " + desc + " at " + time + " on " + d);
 	}
-	
+
 	public void viewEvents(Day d) {
 		LinkedList<Event> eventDay = week.get(d);
-		
+
 		if (eventDay.size() == 0) {
-            System.out.println("No events scheduled for " + d);
-        } else {
-            System.out.println("Events for " + d + ":");
-            Node<Event> current = eventDay.getHead();
-            while (current != null) {
-                System.out.println(current.getValue().getTime() + " - " + current.getValue().getDesc());
-                current = current.getNext();
-            }
-        }
+			System.out.println("No events scheduled for " + d);
+		} else {
+			System.out.println("Events for " + d + ":");
+			Node<Event> current = eventDay.getHead();
+			while (current != null) {
+				System.out.println(current.getValue().getTime() + " - " + current.getValue().getDesc());
+				current = current.getNext();
+			}
+		}
+	}
+	
+	//broken fix this 
+	public void removeEvent(Day d, String time) {
+		LinkedList<Event> dayEvents = week.get(d);
+		Node<Event> current = dayEvents.getHead();
+		
+		int position = 0;
+		boolean found = false;
+		
+		while(current != null) {
+			if(current.getValue().getTime().equals(time)) {
+				dayEvents.remove(position);
+				System.out.println("Event at " + time + " removed from " + d);
+				found = true;
+				break;
+			}
+			current = current.getNext();
+			position++;
+		}
+		
+		if(!found) {
+			System.out.println("Event not found");
+		}
 	}
 
 }
